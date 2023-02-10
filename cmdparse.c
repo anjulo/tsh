@@ -329,6 +329,13 @@ cmd_parse(parsestate_t *parsestate)
              //     have been given fit together. (It may be helpful to
              //     look over cmdparse.h again.)
             /* Your code here. */
+            if(i != 0 || cmd->subshell){ // abc ( or ((
+              goto error;
+            }
+            cmd->subshell = cmd_line_parse(parsestate, 1);
+            if(!cmd->subshell){
+              goto error;
+            }
 			break;
 		default:
 			parse_ungettoken(parsestate);
