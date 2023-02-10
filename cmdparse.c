@@ -214,6 +214,28 @@ cmd_free(command_t *cmd)
 		return;
 
 	/* Your code here. */
+  i = 0;
+  while(cmd->argv[i]){
+    free(cmd->argv[i]); 
+    cmd->argv[i] = NULL;
+    i++;
+  }
+  for(i=0; i<3; i++){
+    if(cmd->redirect_filename[i]){
+      free(cmd->redirect_filename[i]);
+      cmd->redirect_filename[i] = NULL;
+    }
+  }
+  if(cmd->subshell){
+    cmd_free(cmd->subshell);
+    cmd->subshell = NULL;
+  }
+  if(cmd->next){
+    cmd_free(cmd->next);
+    cmd->next = NULL;
+  }
+
+  free(cmd);
 }
 
 
