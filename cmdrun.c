@@ -25,10 +25,10 @@ void cmd_redirect(command_t *cmd){
           perror("open");
           abort();
         }
-        if(dup2(ifd,STDIN_FILENO) == -1){ // duplicate file descriptor
-          perror("dup2");
-          abort();
-        }
+  if(dup2(fd,i) == -1){ // duplicate file descriptor
+    perror("dup2");
+    abort();
+  }
         if(close(ifd) == -1){
           perror("close");
           abort();
@@ -171,7 +171,12 @@ cmd_exec(command_t *cmd, int *pass_pipefd)
   }
   else if(pid == 0){ // child
     if(cmd->redirect_filename){ // redirection
-      cmd_redirect(cmd);
+      if(cmd->redirect_filename[0]) 
+        cmd_redirect(cmd,STDIN_FILENO);
+      if(cmd->redirect_filename[1])
+        cmd_redirect(cmd,STDOUT_FILENO);
+      if(cmd->redirect_filename[2])
+        cmd_redirect(cmd,STDERR_FILENO);
     }
     execvp(cmd->argv[0], cmd->argv);
     perror("execvp");
