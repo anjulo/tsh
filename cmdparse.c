@@ -52,10 +52,7 @@ parse_init(parsestate_t *parsestate, char *input_line)
 void
 parse_gettoken(parsestate_t *parsestate, token_t *token)
 {
-	int i;
-	char *str = parsestate->position;	// current string
-	int quote_state;
-	int any_quotes;
+	char *str = parsestate->position;	// current string 
 
 	while (isspace((unsigned char) *str))
 		str++;
@@ -71,29 +68,28 @@ parse_gettoken(parsestate_t *parsestate, token_t *token)
 
 
 	// Stores the next token into 'token', and terminates the token
-	// with a null character.  Some care is required to handle
+	// buffer with a null character.  Some care is required to handle
 	// quotes properly. We store at most TOKENSIZE - 1 characters
 	// into 'token' (plus a terminating null character); longer
 	// tokens cause an error.
 
-	quote_state = any_quotes = 0;
-	i = 0;
-	while (*str != '\0'
-	       && (quote_state || !isspace((unsigned char) *str))) {
+  int i = 0;
+	int quote_state = 0; // quote state. 0->no quote, 1-> double quote, 2-> backquote
+	int any_quotes = 0;
+	while (*str != '\0' && (quote_state || !isspace((unsigned char) *str))) {
 		if (*str == '\"') {
-			quote_state ^= 1;
-			any_quotes = 1;
+			quote_state ^= 1; // toggle double quote state
+			any_quotes = 1; 
 		} else {
 			if (*str == '`') {
-				quote_state ^= 2;
+				quote_state ^= 2; // toggle backquote state
 				any_quotes = 1;
 			}
 			if (i >= TOKENSIZE - 1)
 				// Token too long; this is an error
 				goto error;
 			token->buffer[i++] = *str;
-			if ((*str == '(' || *str == ')' || *str == ';')
-			    && quote_state == 0) {
+			if ((*str == '(' || *str == ')' || *str == ';') && quote_state == 0) {
 				if (i > 1)
 					--i;
 				else
@@ -185,7 +181,7 @@ cmd_alloc(void)
 		return NULL;
 
 	// Set all its fields to 0
-	memset(cmd, 0, sizeof(*cmd));
+	memset(cmd, 0, sizeof(*cmd)); // can just use calloc()
 
 	return cmd;
 }
@@ -256,7 +252,7 @@ cmd_free(command_t *cmd)
 command_t *
 cmd_parse(parsestate_t *parsestate)
 {
-	int i = 0;
+	int i = 0; // index into cmd->argv[] 
 	command_t *cmd = cmd_alloc();
 	if (!cmd)
 		return NULL;
@@ -271,13 +267,12 @@ cmd_parse(parsestate_t *parsestate)
 		// Redirection file names go into cmd->redirect_filename[].
 		// Open parenthesis tokens indicate a subshell command.
 		// Other tokens complete the current command
-		// and are not actually part of it;
+		// and are not actually part of it; (>,<,2>,)
 		// we use parse_ungettoken() to save those tokens for later.
-
-		switch (token.type) {
-		case TOK_NORMAL:
-                    // Overflow on normal tokens
-			if (i >= MAXTOKENS || cmd->subshell)
+    
+		switch (token.type) {   
+		case TOK_NORMAL:  
+			if (i >= MAXTOKENS || cmd->subshell) // Overflow on normal tokens
 				goto error;
 			cmd->argv[i] = strdup(token.buffer);
 			i++;
@@ -288,17 +283,17 @@ cmd_parse(parsestate_t *parsestate)
 			int fd = token.type - TOK_LESS_THAN;
 			// Can't redirect nothing
 			if (i == 0 && !cmd->subshell)
-				goto error;
-            // Redirection tokens (<, >, 2>) must be followed by
-            // TOK_NORMAL tokens containing file names.
-			parse_gettoken(parsestate, &token);
+				goto error; 
+      // Redirection tokens (<, >, 2>) must be followed by
+      // TOK_NORMAL tokens containing file names.
+			parse_gettoken(parsestate, &token);   
 			if (token.type != TOK_NORMAL)
 				goto error;
 			free(cmd->redirect_filename[fd]);
 			cmd->redirect_filename[fd] = strdup(token.buffer);
 			break;
 		}
-		case TOK_OPEN_PAREN:
+		case TOK_OPEN_PAREN:  // (
 
              // EXERCISE 2: Handle parentheses.
              // NOTE the following:
@@ -338,7 +333,7 @@ cmd_parse(parsestate_t *parsestate)
             }
 			break;
 		default:
-			parse_ungettoken(parsestate);
+			parse_ungettoken(parsestate); // after parsing a command (;)
 			goto done;
 		}
 	}
@@ -347,7 +342,7 @@ cmd_parse(parsestate_t *parsestate)
 	// NULL-terminate the argv list
 	cmd->argv[i] = 0;
 
-	if (i == 0) {
+	if (i == 0 && !cmd->subshell) { //
 		/* Empty command */
 		cmd_free(cmd);
 		return NULL;
@@ -400,7 +395,8 @@ cmd_line_parse(parsestate_t *parsestate, int in_parens)
 			prev_cmd->next = cmd;
 		else
 			head = cmd;
-		prev_cmd = cmd;
+		prev_cmd = cmd; // should be specific to the if case.
+                    // not needed in the else case
 
 		// Fetch the next token to see how to connect this
 		// command with the next command.  React to errors with
@@ -420,7 +416,7 @@ cmd_line_parse(parsestate_t *parsestate, int in_parens)
 		case TOK_AMPERSAND:
 			cmd->controlop = (controlop_t) token.type;
 			parse_gettoken(parsestate, &token);
-			if (token.type == TOK_END || token.type == TOK_CLOSE_PAREN)
+			if (token.type == TOK_END || token.type == TOK_CLOSE_PAREN) // & or or &) -> backgrounding ( in paren)
 				goto ender;
 			parse_ungettoken(parsestate);
 			break;
@@ -428,7 +424,7 @@ cmd_line_parse(parsestate_t *parsestate, int in_parens)
 		ender:
 		case TOK_END:
 		case TOK_CLOSE_PAREN:
-			if ((token.type == TOK_END) == (in_parens != 0))
+			if ((token.type == TOK_END) == (in_parens != 0))  //tok_end and not in parenthesis
 				goto error;
 			goto done;
 
