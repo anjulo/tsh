@@ -227,6 +227,17 @@ cmd_line_exec(command_t *cmdlist)
 		// If an error occurs in cmd_exec, feel free to abort().
 
 		/* Your code here */
+    switch (cmdlist->controlop)
+    {
+    case CMD_END:
+    case CMD_SEMICOLON:
+      cmd_status = cmd_exec(cmdlist, &pipefd);
+      waitpid(cmd_status, &wp_status, 0);
+      break;
+    
+    default:
+      break;
+    }
 
 		cmdlist = cmdlist->next;
 	}
