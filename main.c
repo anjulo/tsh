@@ -37,8 +37,8 @@ main(int argc, char *argv[])
 	}
 
 	while (!feof(stdin)) {
-		parsestate_t parsestate;
-		command_t *cmdlist;
+    parsestate_t parsestate;
+		command_t *cmdlist; // linked list for a command
 		// Print the prompt
 		if (!quiet) {
 			printf("cs5600$ ");
@@ -46,8 +46,10 @@ main(int argc, char *argv[])
 		}
 
 		// Read a string, checking for error or EOF
-		if (fgets(input, BUFSIZ, stdin) == NULL) {
-			if (ferror(stdin) && errno == EINTR) {
+		if (fgets(input, BUFSIZ, stdin) == NULL) {  
+			if (ferror(stdin) && errno == EINTR) { // errno - global variable for error status
+                                             // EINTR - interrupt
+                                             // ferror - checks if error has occurred in a file stream
 				cmd_line_exec(0);
 				continue;
 			}
@@ -74,12 +76,12 @@ main(int argc, char *argv[])
 			fflush(stdout);
 		}
 
-                // this actually invokes the command list.
-                // you will fill in cmd_line_exec.
+    // this actually invokes the command list.
+    // you will fill in cmd_line_exec.
 		if (!parseonly && cmdlist)
 			cmd_line_exec(cmdlist);
-                if (cmdlist)
-                        cmd_free(cmdlist);
+    if (cmdlist)
+      cmd_free(cmdlist);
 
 	}
 
