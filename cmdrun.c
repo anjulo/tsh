@@ -114,98 +114,20 @@ cmd_exec(command_t *cmd, int *pass_pipefd)
 	if (cmd->controlop == CMD_PIPE) {
 		/* Your code here*/
 	}
-
-
-	// Fork the child and execute the command in that child.
-	// You will handle all redirections by manipulating file descriptors.
-	//
-	// This section is fairly long.  It is probably best to implement this
-	// part in stages, checking it after each step.  For example:
-        //
-	//   --First implement just the fork and the execute in the
-	//   child (as we saw in class).  This should allow you to
-	//   execute simple commands like 'ls'. Some of the tests in
-	//   "make test" ought to pass.
-	//   --Next, add support for redirections: as a simple test,
-	//   'ls > foo' followed by 'cat < foo' should display the
-	//   directory listing. A few more of the tests in "make test"
-	//   should pass.
-	//   --Next, support parentheses (a few more tests should pass,
-	//     etc.)
-	//   --Then pipes (if you use our pseudocode from class as
-	//   inspiration, NOTE that the logic is a bit different in this lab)
-	//   --And finally the internal commands 'cd', 'exit', and
-	//   'our_pwd'.
-	//
-	//  Throughout, you will be using system calls: fork(), dup2(),
-	//  close(), open(), execvp() or execve(), exit(), chdir(), etc.
-	//
-	//  You can also use perror() to handle error conditions
-	//  concisely (type "$ man 3 perror" in a Unix terminal to get
-	//  documentation).
-	//
-	//  You will need to do real C programming here.
-	//  Tools like gdb (the debugger) may be useful.
-	//
-	//  You will also find functions like strcmp() and strtol()
-	//  useful. Type "man strcmp", etc. for more information.
-	//
-	// In the child, you should:
-	//    1. Set up stdout to point to this command's pipe, if necessary;
-	//       close some file descriptors, if necessary (which ones?)
-	//    2. Set up stdin to point to the PREVIOUS command's pipe (that
-	//       is, *pass_pipefd), if appropriate; close a file
-	//       descriptor (which one?)
-	//    3. Set up redirections. Use the open() system call.
-	//       Hints:
-	//          --For input redirections, the oflag should be O_RDONLY.
-	//          --For output redirections (stdout and stderr), what
-	//          oflags do you want?
-	//          --Set the mode argument of open() to be 0666
-	//    4. Execute the command.
-	//       There are some special cases:
-	//       a. Parentheses.  Execute cmd->subshell. How? Also,
-	//          you won't be invoking exec() in this special case,
-	//          so think carefully about how this path "ends". (What
-	//          would happen if we were to return from the current
-	//          function?)
-	//       b. A null command (no subshell, no arguments).
-	//          Exit with status 0.
-	//       c. "exit".
-	//       d. "cd".
-	//       e. "our_pwd".
-	//       f. Remember to make your implementation
-	//       consistent with the specification above!
-	//
-	// In the parent, you should:
-	//    1. Close some file descriptors.  Hint: Consider the write end
-	//       of this command's pipe, and one other fd as well.
-	//    2. Handle the special "exit", "cd", and "our_pwd" commands.
-	//    3. Set *pass_pipefd as appropriate.
-	//
-	// "cd","exit","our_pwd" Hints:
-	//    Recall from the comments earlier that you need to return a status,
-	//    and do redirections. How can you do these things for a
-	//    command executed in the parent shell?
-	//    Answer: It's easest if you fork a child ANYWAY!
-        //    You should divide functionality between the parent and the child.
-        //    Some functions will be executed in each process. For example,
-        //         --in the case of "exit", both parent and child
-        //         need to exit, but only the parent's exit code "matters",
-        //         --in the case of "cd", both parent and child should
-        //         try to change directory (use chdir()), but only the child
-        //         should print error messages
-        //         --in the case of "our_pwd", see "man getcwd"
-	//
-	//    For the "cd" command, you should change directories AFTER
-	//    the fork(), not before it.  Why?
-	//    Design some tests with 'bash' that will tell you the answer.
-	//    For example, try "cd /tmp ; cd $HOME > foo".  In which directory
-	//    does foo appear, /tmp or $HOME?  If you chdir() BEFORE the fork,
-	//    in which directory would foo appear, /tmp or $HOME?
-	//
-	/* Your code here */
-
+  pid =  fork();
+  if(pid == -1){
+    perror("fork");
+    abort();
+  }
+  else if(pid == 0){ // child
+    execvp(cmd->argv[0], cmd->argv);
+    perror("execvp");
+    abort();
+  }
+  else{
+    //return pid;
+  }
+  
 	// return the child process ID
 	return pid;
 }
