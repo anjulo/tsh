@@ -16,6 +16,56 @@
 #include "cmdparse.h"
 #include "cmdrun.h"
 
+
+void cmd_redirect(command_t *cmd){
+  int ifd, ofd, efd ; // input, output and error file descriptors
+  if(cmd->redirect_filename[0]){
+        ifd = open(cmd->redirect_filename[0], O_RDONLY); //0666 is default, anyways!
+        if(ifd == -1){
+          perror("open");
+          abort();
+        }
+        if(dup2(ifd,STDIN_FILENO) == -1){ // duplicate file descriptor
+          perror("dup2");
+          abort();
+        }
+        if(close(ifd) == -1){
+          perror("close");
+          abort();
+        }
+      }
+  if(cmd->redirect_filename[1]){
+        ofd = open(cmd->redirect_filename[1], O_CREAT | O_WRONLY, 0666); //0666 is default, anyways!
+        if(ofd == -1){
+          perror("open");
+          abort();
+        }
+        if(dup2(ofd,STDOUT_FILENO) == -1){ // duplicate file descriptor
+          perror("dup2");
+          abort();
+        }
+        if(close(ofd) == -1){
+          perror("close");
+          abort();
+        }
+      }
+  if(cmd->redirect_filename[2]){
+        efd = open(cmd->redirect_filename[2], O_CREAT | O_WRONLY, 0666); //0666 is default, anyways!
+        if(efd == -1){
+          perror("open");
+          abort();
+        }
+        if(dup2(efd,STDOUT_FILENO) == -1){ // duplicate file descriptor
+          perror("dup2");
+          abort();
+        }
+        if(close(efd) == -1){
+          perror("close");
+          abort();
+        }
+      }
+ 
+}
 /* cmd_exec(cmd, pass_pipefd)
  *
  *   Execute the single command specified in the 'cmd' command structure.
@@ -120,6 +170,9 @@ cmd_exec(command_t *cmd, int *pass_pipefd)
     abort();
   }
   else if(pid == 0){ // child
+    if(cmd->redirect_filename){ // redirection
+      cmd_redirect(cmd);
+    }
     execvp(cmd->argv[0], cmd->argv);
     perror("execvp");
     abort();
