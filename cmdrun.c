@@ -17,22 +17,24 @@
 #include "cmdrun.h"
 
 
-void cmd_redirect(command_t *cmd){
-  int ifd, ofd, efd ; // input, output and error file descriptors
-  if(cmd->redirect_filename[0]){
-        ifd = open(cmd->redirect_filename[0], O_RDONLY); //0666 is default, anyways!
-        if(ifd == -1){
-          perror("open");
-          abort();
-        }
+void cmd_redirect(command_t *cmd, int i){
+  int fd;
+  if(i == 0)
+    fd = open(cmd->redirect_filename[i], O_RDONLY);
+  else
+    fd = open(cmd->redirect_filename[i], O_CREAT | O_WRONLY, 0666); //0666 is default, anyways!
+  if(fd == -1){
+    perror("open");
+    abort();
+  }
   if(dup2(fd,i) == -1){ // duplicate file descriptor
     perror("dup2");
     abort();
   }
-        if(close(ifd) == -1){
-          perror("close");
-          abort();
-        }
+  if(close(fd) == -1){
+    perror("close");
+    abort();
+  }
       }
   if(cmd->redirect_filename[1]){
         ofd = open(cmd->redirect_filename[1], O_CREAT | O_WRONLY, 0666); //0666 is default, anyways!
