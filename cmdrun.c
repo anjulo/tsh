@@ -35,37 +35,6 @@ void cmd_redirect(command_t *cmd, int i){
     perror("close");
     abort();
   }
-      }
-  if(cmd->redirect_filename[1]){
-        ofd = open(cmd->redirect_filename[1], O_CREAT | O_WRONLY, 0666); //0666 is default, anyways!
-        if(ofd == -1){
-          perror("open");
-          abort();
-        }
-        if(dup2(ofd,STDOUT_FILENO) == -1){ // duplicate file descriptor
-          perror("dup2");
-          abort();
-        }
-        if(close(ofd) == -1){
-          perror("close");
-          abort();
-        }
-      }
-  if(cmd->redirect_filename[2]){
-        efd = open(cmd->redirect_filename[2], O_CREAT | O_WRONLY, 0666); //0666 is default, anyways!
-        if(efd == -1){
-          perror("open");
-          abort();
-        }
-        if(dup2(efd,STDOUT_FILENO) == -1){ // duplicate file descriptor
-          perror("dup2");
-          abort();
-        }
-        if(close(efd) == -1){
-          perror("close");
-          abort();
-        }
-      }
  
 }
 /* cmd_exec(cmd, pass_pipefd)
