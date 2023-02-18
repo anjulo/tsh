@@ -250,8 +250,13 @@ cmd_exec(command_t *cmd, int *pass_pipefd)
     redirect_io(cmd);
     
     //subshell
-    if(cmd->subshell)
-      return cmd_line_exec(cmd->subshell);
+    if(cmd->subshell){
+      int ss_status = cmd_line_exec(cmd->subshell);
+      if(ss_status) // non- zero status
+        exit(5);
+      exit(0);
+    }
+
     
     // builtin commands for the child
     // cd
