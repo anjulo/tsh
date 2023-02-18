@@ -1,7 +1,7 @@
-Name:
-NUID:
-slack hours used: 0
-remaining slack hours: 120
+Name: Bereket Yisehak Faltamo
+NUID: 002657375
+slack hours used: 19
+remaining slack hours: 120 - 19 = 101
 Challenge (optional): No
 
 Collaborators (who you talked to about the lab, what you talked about):
