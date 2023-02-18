@@ -34,7 +34,7 @@ void redirect_io(command_t *cmd){
       if(i == 0)
         fd = open(cmd->redirect_filename[i], O_RDONLY);
       else
-        fd = open(cmd->redirect_filename[i], O_CREAT | O_WRONLY, 0666); //0666 is default, anyways!
+        fd = open(cmd->redirect_filename[i], O_CREAT | O_TRUNC |  O_WRONLY, 0666); //0666 is default, anyways!
       if(fd == -1){
         perror("open");
         abort();
