@@ -24,21 +24,25 @@
 
 void redirect_io(command_t *cmd){
   int fd;
-  if(i == 0)
-    fd = open(cmd->redirect_filename[i], O_RDONLY);
-  else
-    fd = open(cmd->redirect_filename[i], O_CREAT | O_WRONLY, 0666); //0666 is default, anyways!
-  if(fd == -1){
-    perror("open");
-    abort();
-  }
-  if(dup2(fd,i) == -1){ // duplicate file descriptor
-    perror("dup2");
-    abort();
-  }
-  if(close(fd) == -1){
-    perror("close");
-    abort();
+  for (int i = 0; i <= 2; i++){
+    if (cmd->redirect_filename[i]){
+      if(i == 0)
+        fd = open(cmd->redirect_filename[i], O_RDONLY);
+      else
+        fd = open(cmd->redirect_filename[i], O_CREAT | O_WRONLY, 0666); //0666 is default, anyways!
+      if(fd == -1){
+        perror("open");
+        abort();
+      }
+      if(dup2(fd,i) == -1){ // duplicate file descriptor
+        perror("dup2");
+        abort();
+      }
+      if(close(fd) == -1){
+        perror("close");
+        abort();
+      }
+    }
   }
 }
 int containsNonNumeric(const char *str){
