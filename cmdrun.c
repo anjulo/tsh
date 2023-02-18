@@ -195,15 +195,7 @@ cmd_exec(command_t *cmd, int *pass_pipefd)
 	pid_t cpid = -1;	
 	int pipefd[2];		// file descriptors for this process's pipe
 
-	/* EXERCISE 4: Complete this function!
-	 * We've written some of the skeleton for you, but feel free to
-	 * change it.
-	 */
-
-	// Create a pipe, if this command is the left-hand side of a pipe.
-	// Return -1 if the pipe fails.
 	if (cmd->controlop == CMD_PIPE) {
-		/* Your code here*/
     if(pipe(pipefd) == -1){
       perror("pipe");
       return -1;
@@ -223,8 +215,7 @@ cmd_exec(command_t *cmd, int *pass_pipefd)
     //pipe
     // 1. Set up stdout to point to this command's pipe, if necessary;
     //     close some file descriptors, if necessary (which ones?)
-    //a | b
-    //a
+    
     if(cmd->controlop == CMD_PIPE){  
       if(dup2(pipefd[1], STDOUT_FILENO) == -1){
         perror("dup2");
@@ -242,7 +233,6 @@ cmd_exec(command_t *cmd, int *pass_pipefd)
     // 2. Set up stdin to point to the PREVIOUS command's pipe (that
     // is, *pass_pipefd), if appropriate; close a file
     //     descriptor (which one?)
-    //b
     
     if(dup2(*pass_pipefd, STDIN_FILENO) == -1){
       perror("dup2");
@@ -277,6 +267,7 @@ cmd_exec(command_t *cmd, int *pass_pipefd)
       return our_pwd_exec(cmd, true);
     }
     
+    // execute non-builtin commands
     execvp(cmd->argv[0], cmd->argv);
     perror("execvp");
     return -1;
@@ -307,11 +298,10 @@ cmd_exec(command_t *cmd, int *pass_pipefd)
       *pass_pipefd = STDIN_FILENO;
     }
 
-    // parent process for a chile that executes a subshell
-    if(cmd->subshell){
+    if(cmd->subshell)
       return cpid;
-    }
-    // internal commands for the parent process
+    
+    // built-in commands in the parent process
     //cd
     if(strcmp(cmd->argv[0], "cd") == 0){
       if(cd_exec(cmd, false))
