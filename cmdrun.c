@@ -213,43 +213,34 @@ cmd_exec(command_t *cmd, int *pass_pipefd)
   else if(cpid == 0){
     
     //pipe
-    // 1. Set up stdout to point to this command's pipe, if necessary;
-    //     close some file descriptors, if necessary (which ones?)
-    
+    // setup stdout to this command's pipe
     if(cmd->controlop == CMD_PIPE){  
-      if(dup2(pipefd[1], STDOUT_FILENO) == -1){
+      if(close(pipefd[0]) == -1){ // close read end of pipe
+        perror("close");
+        return -1;
+      }
+      if(dup2(pipefd[1], STDOUT_FILENO) == -1){ // redirect stdout to write end of pipe
         perror("dup2");
         return -1;
       }
-      if(close(pipefd[0]) == -1){
-        perror("close");
-        return -1;
-      }
-      if(close(pipefd[1]) == -1){
+      if(close(pipefd[1]) == -1){ // close write end of pipe
         perror("close");
         return -1;
       }
     }
-    // 2. Set up stdin to point to the PREVIOUS command's pipe (that
-    // is, *pass_pipefd), if appropriate; close a file
-    //     descriptor (which one?)
-    
-    if(dup2(*pass_pipefd, STDIN_FILENO) == -1){
-      perror("dup2");
-      return -1;
-    }
-      /*
-      if(close(*pass_pipefd) == -1){
-        perror("close");
-        exit(EXIT_FAILURE);
+    // setup stdin to previous command's pipe
+    if(*pass_pipefd != STDIN_FILENO){
+      if(dup2(*pass_pipefd, STDIN_FILENO) == -1){ // redirect stdin to read end of previous pipe
+        perror("dup2");
+        return -1;
       }
-      */
-
+      pass_pipefd = NULL; // set to NULL so that it doesn't get closed in the parent
+    }
 
     // io redirection
     redirect_io(cmd);
     
-    //subshell
+    // sub-shell
     if(cmd->subshell){
       int ss_status = cmd_line_exec(cmd->subshell);
       if(ss_status) // non- zero status
@@ -282,30 +273,23 @@ cmd_exec(command_t *cmd, int *pass_pipefd)
     perror("execvp");
     return -1;
   }
-  /* In the parent, you should:
-        1. Close some file descriptors.  Hint: Consider the write end
-           of this command's pipe, and one other fd as well.
-        2. Handle the special "exit", "cd", and "our_pwd" commands.
-        3. Set *pass_pipefd as appropriate.
-  */
+
   // parent
   else{ 
     // close pipes
+    if(*pass_pipefd != STDIN_FILENO){
+      if(close(*pass_pipefd) == -1){ // close read end of previous pipe
+        perror("close");
+        return -1;
+      }
+      *pass_pipefd = STDIN_FILENO; // set to STDIN_FILENO
+    }
     if(cmd->controlop == CMD_PIPE){
       if(close(pipefd[1]) == -1){ // close write end of this pipe
         perror("close");
         return -1;
       }
-      /*
-      if(close(*pass_pipefd) == -1){ // close read end of previous pipe
-        perror("close");
-        exit(EXIT_FAILURE);
-      }
-      */
       *pass_pipefd = pipefd[0]; // set pass_pipefd to read end of this pipe
-    }
-    else{
-      *pass_pipefd = STDIN_FILENO;
     }
 
     if(cmd->subshell)
