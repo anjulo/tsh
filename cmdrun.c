@@ -261,7 +261,9 @@ cmd_exec(command_t *cmd, int *pass_pipefd)
     // builtin commands for the child
     // cd
     if(strcmp(cmd->argv[0], "cd") == 0){
-      return cd_exec(cmd, true);
+      if(!cd_exec(cmd, true))
+        exit(0);
+      exit(1);
     }
     //exit
     if(strcmp(cmd->argv[0], "exit") == 0){
@@ -308,18 +310,17 @@ cmd_exec(command_t *cmd, int *pass_pipefd)
     
     // built-in commands in the parent process
     //cd
-    if(strcmp(cmd->argv[0], "cd") == 0){
-      if(cd_exec(cmd, false))
+    if(strcmp(cmd->argv[0], "cd") == 0){ 
+      if(cd_exec(cmd, false) == -1) // syscall erro
         return -1;
     }
     //exit
     if(strcmp(cmd->argv[0], "exit") == 0){
-      if(exit_exec(cmd, false))
-        return -1;
+      exit_exec(cmd, false);
     }
     //our_pwd
     if(strcmp(cmd->argv[0], "our_pwd") == 0){
-      if(our_pwd_exec(cmd, false))
+      if(our_pwd_exec(cmd, false) == -1)
         return -1;
     }    
     return cpid;
