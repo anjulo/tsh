@@ -267,11 +267,14 @@ cmd_exec(command_t *cmd, int *pass_pipefd)
     }
     //exit
     if(strcmp(cmd->argv[0], "exit") == 0){
-        return exit_exec(cmd, true);
+        if(exit_exec(cmd, true))
+          exit(1);
     }
     //our_pwd
     if(strcmp(cmd->argv[0], "our_pwd") == 0){
-      return our_pwd_exec(cmd, true);
+      if(!our_pwd_exec(cmd, true))
+        exit(0);
+      exit(1);
     }
     
     // execute non-builtin commands
@@ -338,7 +341,6 @@ int
 cmd_line_exec(command_t *cmdlist)
 {
 	int cmd_status = 0;	    // status of last command executed
-  int cmd_pid; // command pid
 	int pipefd = STDIN_FILENO;  // read end of last pipe
 
 	while (cmdlist) {
@@ -346,11 +348,7 @@ cmd_line_exec(command_t *cmdlist)
 				                // Read the manual page for waitpid() to
 				                // see how to get the command's exit
 				                // status (cmd_status) from this value.
-
-		// EXERCISE 4: Fill out this function!
-		// If an error occurs in cmd_exec, feel free to abort().
-
-		/* Your code here */
+    pid_t cmd_pid;	 
     switch (cmdlist->controlop)
     {
       case CMD_END:
