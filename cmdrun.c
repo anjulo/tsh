@@ -78,7 +78,7 @@ int cd_exec(command_t *cmd, bool verbose){
         sprintf(buf, "cd: Syntax error! Wrong number of arguments! \n");
         write(STDERR_FILENO, buf, strlen(buf));
       }
-      return -1;
+      return 1;
     }
     // replace ~ and $HOME with getenv("HOME")
     if(cmd->argv[1][0] == '~'){
@@ -89,7 +89,7 @@ int cd_exec(command_t *cmd, bool verbose){
           sprintf(buf, "cd: HOME not set! \n");
           write(STDERR_FILENO, buf, strlen(buf));
         }
-        return -1;
+        return 1;
       }
       char *new = malloc(strlen(home) + strlen(cmd->argv[1]) + 1);  
       strcpy(new, home);
@@ -107,7 +107,7 @@ int cd_exec(command_t *cmd, bool verbose){
           sprintf(buf, "cd: HOME not set! \n");
           write(STDERR_FILENO, buf, strlen(buf));
         }
-        return -1;
+        return 1;
       }
       char *new = malloc(strlen(home) + strlen(cmd->argv[1]) + 1);  
       strcpy(new, home);
@@ -141,7 +141,7 @@ int exit_exec(command_t *cmd, bool verbose){
       sprintf(buf, "exit: Syntax error! Wrong number of arguments! \n");
       write(STDERR_FILENO, buf, strlen(buf));
     }
-    return -1;
+    return 1;
   }
   else{
     if(containsNonNumeric(cmd->argv[1]))
@@ -164,7 +164,7 @@ int our_pwd_exec(command_t *cmd, bool verbose){
       sprintf(buf, "pwd: Syntax error! Wrong number of arguments! \n");
       write(STDERR_FILENO, buf, strlen(buf));
     }
-    return -1;
+    return 1;
   }
   char buf[PATH_MAX];
   if(!getcwd(buf, PATH_MAX)){
