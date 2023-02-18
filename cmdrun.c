@@ -22,7 +22,7 @@
 #define PATH_MAX 4096
 #endif
 
-void redirect_io(command_t *cmd, int i){
+void redirect_io(command_t *cmd){
   int fd;
   if(i == 0)
     fd = open(cmd->redirect_filename[i], O_RDONLY);
@@ -219,10 +219,8 @@ cmd_exec(command_t *cmd, int *pass_pipefd)
 
 
     // io redirection
-    for (int i = 0; i <= 2; i++) {
-      if (cmd->redirect_filename[i])
-        redirect_io(cmd, i);
-    }
+    redirect_io(cmd);
+    
     //subshell
     if(cmd->subshell)
       return cmd_line_exec(cmd->subshell);
