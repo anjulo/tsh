@@ -154,7 +154,7 @@ static pid_t
 cmd_exec(command_t *cmd, int *pass_pipefd)
 {
   (void)pass_pipefd;      // get rid of unused warning
-	pid_t pid = -1;		// process ID for child
+	pid_t cpid = -1;	
 	int pipefd[2];		// file descriptors for this process's pipe
 
 	/* EXERCISE 4: Complete this function!
@@ -173,14 +173,14 @@ cmd_exec(command_t *cmd, int *pass_pipefd)
 	}
 
   // fork
-  pid =  fork();
-  if(pid == -1){
+  cpid =  fork();
+  if(cpid == -1){
     perror("fork");
     return -1;
   }
 
   // child
-  else if(pid == 0){
+  else if(cpid == 0){
     
     //pipe
     // 1. Set up stdout to point to this command's pipe, if necessary;
@@ -271,7 +271,7 @@ cmd_exec(command_t *cmd, int *pass_pipefd)
 
     // parent process for a chile that executes a subshell
     if(cmd->subshell){
-      return pid;
+      return cpid;
     }
     // internal commands for the parent process
     //cd
@@ -289,8 +289,7 @@ cmd_exec(command_t *cmd, int *pass_pipefd)
       if(our_pwd_exec(cmd, false))
         return -1;
     }    
-    // return the child process ID
-    return pid;
+    return cpid;
   }
 }
 
@@ -306,6 +305,7 @@ int
 cmd_line_exec(command_t *cmdlist)
 {
 	int cmd_status = 0;	    // status of last command executed
+  int cmd_pid; // command pid
 	int pipefd = STDIN_FILENO;  // read end of last pipe
 
 	while (cmdlist) {
@@ -320,38 +320,42 @@ cmd_line_exec(command_t *cmdlist)
 		/* Your code here */
     switch (cmdlist->controlop)
     {
-    case CMD_END:
-    case CMD_SEMICOLON:
-      cmd_status = cmd_exec(cmdlist, &pipefd);
-      waitpid(cmd_status, &wp_status, 0);
-      break;
-    
-    case CMD_AND:
-      cmd_status = cmd_exec(cmdlist, &pipefd);
-      waitpid(cmd_status, &wp_status, 0);
-      if(WEXITSTATUS(wp_status) != 0)
-        goto done;
-      break;
-    case CMD_OR:
-      cmd_status = cmd_exec(cmdlist, &pipefd);
-      waitpid(cmd_status, &wp_status, 0);
-      if(WEXITSTATUS(wp_status) == 0)
-        goto done;
-      break;
+      case CMD_END:
+      case CMD_SEMICOLON:
+        cmd_pid = cmd_exec(cmdlist, &pipefd);
+        waitpid(cmd_pid, &wp_status, 0);
+        cmd_status = WEXITSTATUS(wp_status);
+        break;
       
-    case CMD_BACKGROUND:
-    case CMD_PIPE:
-      cmd_status = cmd_exec(cmdlist, &pipefd);
-      break;
-    
-    default:
-      break;
+      case CMD_AND:
+        cmd_pid = cmd_exec(cmdlist, &pipefd);
+        waitpid(cmd_pid, &wp_status, 0);
+        cmd_status = WEXITSTATUS(wp_status);
+        if(cmd_status != 0) // if the last command exited with non-zero status
+          goto done;
+        break;
+      case CMD_OR:
+        cmd_pid = cmd_exec(cmdlist, &pipefd);
+        waitpid(cmd_pid, &wp_status, 0);
+        cmd_status = WEXITSTATUS(wp_status);
+        if(WEXITSTATUS(wp_status) == 0)
+          goto done;
+        break;
+        
+      case CMD_BACKGROUND:
+      case CMD_PIPE:
+        cmd_exec(cmdlist, &pipefd);
+        cmd_status = 0;
+        break;
+      
+      default:
+        break;
     }
     
 		cmdlist = cmdlist->next;
 	}
 
-        while (waitpid(0, 0, WNOHANG) > 0); 
+        while (waitpid(0, 0, WNOHANG) > 0);  // reap any zombies
 
 done:
 	return cmd_status;
