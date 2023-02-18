@@ -22,6 +22,11 @@
 #define PATH_MAX 4096
 #endif
 
+/**
+ * Redirect I/O for a command.
+ * 
+ * @param cmd The command to redirect I/O for.
+ */
 void redirect_io(command_t *cmd){
   int fd;
   for (int i = 0; i <= 2; i++){
@@ -45,6 +50,12 @@ void redirect_io(command_t *cmd){
     }
   }
 }
+/**
+ * Determine if a string contains non-numeric characters.
+ * 
+ * @param str The string to check.
+ * @return 1 if the string contains non-numeric characters, 0 otherwise.
+ */
 int containsNonNumeric(const char *str){
   size_t i;
   for(i = 0; i < strlen(str); i++){
@@ -53,12 +64,12 @@ int containsNonNumeric(const char *str){
   }
   return 0;
 }
-/*
+/**
   * cd_exec - Execute a cd.
   * @cmd: The command to execute.
   * @verbose: If true, print error messages.
   *
-  * Returns 0 on success, 1 on syntax error, -1 on syscall error.
+  * @return 0 on success, 1 on syntax error, -1 on syscall error.
 */
 int cd_exec(command_t *cmd, bool verbose){ 
     if(!cmd->argv[1] || cmd->argv[2]){
@@ -113,7 +124,7 @@ int cd_exec(command_t *cmd, bool verbose){
     }
     return 0;
 }
-/*
+/**
   * exit_exec - Execute an exit.
   * @cmd: The command to execute.
   * @verbose: If true, print error messages.
@@ -139,7 +150,7 @@ int exit_exec(command_t *cmd, bool verbose){
       exit(atoi(cmd->argv[1]));
   }
 }
-/*
+/**
   * our_pwd_exec - Execute our_pwd.
   * @cmd: The command to execute.
   * @verbose: If true, print error messages.
@@ -169,13 +180,13 @@ int our_pwd_exec(command_t *cmd, bool verbose){
   return 0;
 }
 
-/*
-  * cmd_exec - Execute a command.
+/**
+  * Executes a single command.
   * @cmd: The command to execute.
   * @pass_pipefd: If this command is the right-hand side of a pipe, this
   *   is the file descriptor for the pipe. Otherwise, it's STDIN_FILENO.
   *
-  * Returns the process ID of the child process, or -1 on if some syscall fails. 
+  * @return the process ID of the child process, or -1 on if some syscall fails. 
 */
 static pid_t
 cmd_exec(command_t *cmd, int *pass_pipefd)
@@ -321,12 +332,11 @@ cmd_exec(command_t *cmd, int *pass_pipefd)
 }
 
 
-/*
- * cmd_line_exec: Execute a command line.
+/**
+ * Executes a command line.
+ * 
  * @cmdline: The command line to execute.
- *
- * This function executes a command line . It returns the exit status
- * of the last command executed, or -1 if an error occurs.
+ * @return the exit status of the last command executed, or -1 if an error occurs.
  */
 int
 cmd_line_exec(command_t *cmdlist)
