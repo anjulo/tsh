@@ -53,6 +53,13 @@ int containsNonNumeric(const char *str){
   }
   return 0;
 }
+/*
+  * cd_exec - Execute a cd.
+  * @cmd: The command to execute.
+  * @verbose: If true, print error messages.
+  *
+  * Returns 0 on success, 1 on syntax error, -1 on syscall error.
+*/
 int cd_exec(command_t *cmd, bool verbose){ 
     if(!cmd->argv[1] || cmd->argv[2]){
       if(verbose){
@@ -106,6 +113,13 @@ int cd_exec(command_t *cmd, bool verbose){
     }
     return 0;
 }
+/*
+  * exit_exec - Execute an exit.
+  * @cmd: The command to execute.
+  * @verbose: If true, print error messages.
+  *
+  * Returns 1 on syntax error, -1 on syscall error and exits on success.
+*/
 int exit_exec(command_t *cmd, bool verbose){
   if(!cmd->argv[1]){
     exit(0);
@@ -125,6 +139,13 @@ int exit_exec(command_t *cmd, bool verbose){
       exit(atoi(cmd->argv[1]));
   }
 }
+/*
+  * our_pwd_exec - Execute our_pwd.
+  * @cmd: The command to execute.
+  * @verbose: If true, print error messages.
+  *
+  * Returns 0 on success, 1 on syntax error, -1 on syscall error.
+*/
 int our_pwd_exec(command_t *cmd, bool verbose){
   if(cmd->argv[1]){
     if(verbose){
@@ -147,13 +168,15 @@ int our_pwd_exec(command_t *cmd, bool verbose){
   }
   return 0;
 }
+
 /*
- * cmd_line_exec: Execute a command line.
- * @cmdline: The command line to execute.
- *
- * This function executes a command. It returns the exit status
- * of the last command executed, or -1 if an error occurs.
- */
+  * cmd_exec - Execute a command.
+  * @cmd: The command to execute.
+  * @pass_pipefd: If this command is the right-hand side of a pipe, this
+  *   is the file descriptor for the pipe. Otherwise, it's STDIN_FILENO.
+  *
+  * Returns the process ID of the child process, or -1 on if some syscall fails. 
+*/
 static pid_t
 cmd_exec(command_t *cmd, int *pass_pipefd)
 {
