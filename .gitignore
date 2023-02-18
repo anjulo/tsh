@@ -1,2 +1,6 @@
 *.o
 cs5600sh
+.vscode
+input.txt
+output.txt
+error.txt
