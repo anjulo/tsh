@@ -181,6 +181,35 @@ int our_pwd_exec(command_t *cmd, bool verbose){
 }
 
 /**
+  * help_exec - Execute help.
+  * @cmd: The command to execute.
+  *
+  * Returns 0 on success, 1 on syntax error, -1 on syscall error.
+*/
+int help_exec(command_t *cmd){
+  // // TODO: use flags to determine which help message to print
+  // if(cmd->argv[1]){
+  //   char buf[100];
+  //   sprintf(buf, "help: Syntax error! Wrong number of arguments! \n");
+  //   write(STDERR_FILENO, buf, strlen(buf));
+  //   return 1;
+  // }
+  char buf[1000];
+  // TODO: Add help message for each command
+  sprintf(buf, "Tux shell - a simple shell. \nThese shell commands are defined internally. Type 'help' to see this list. \n");
+  write(STDOUT_FILENO, buf, strlen(buf));
+  sprintf(buf, "help - print this help message. \n");
+  write(STDOUT_FILENO, buf, strlen(buf));
+  sprintf(buf, "cd [dir] - change directory to dir. If dir is not specified, change to $HOME. \n");
+  write(STDOUT_FILENO, buf, strlen(buf));
+  sprintf(buf, "exit [n] - exit the shell. If n is not specified, exit with status 0. \n");
+  write(STDOUT_FILENO, buf, strlen(buf));
+  sprintf(buf, "our_pwd - print the current working directory. \n");
+  write(STDOUT_FILENO, buf, strlen(buf));
+  return 0;
+}
+
+/**
   * Executes a single command.
   * @cmd: The command to execute.
   * @pass_pipefd: If this command is the right-hand side of a pipe, this
@@ -256,17 +285,22 @@ cmd_exec(command_t *cmd, int *pass_pipefd)
         exit(0);
       exit(1);
     }
-    //exit
+    // exit
     if(strcmp(cmd->argv[0], "exit") == 0){
         if(exit_exec(cmd, true))
           exit(1);
     }
-    //our_pwd
+    // our_pwd
     if(strcmp(cmd->argv[0], "our_pwd") == 0){
       if(!our_pwd_exec(cmd, true))
         exit(0);
       exit(1);
     }
+    // help
+    if(strcmp(cmd->argv[0], "help") == 0){
+      exit(0);
+    }
+
     
     // execute non-builtin commands
     execvp(cmd->argv[0], cmd->argv);
@@ -296,20 +330,26 @@ cmd_exec(command_t *cmd, int *pass_pipefd)
       return cpid;
     
     // built-in commands in the parent process
-    //cd
+    // cd
     if(strcmp(cmd->argv[0], "cd") == 0){ 
-      if(cd_exec(cmd, false) == -1) // syscall erro
+      if(cd_exec(cmd, false) == -1) // syscall error
         return -1;
     }
-    //exit
+    // exit
     if(strcmp(cmd->argv[0], "exit") == 0){
       exit_exec(cmd, false);
     }
-    //our_pwd
+    // our_pwd
     if(strcmp(cmd->argv[0], "our_pwd") == 0){
       if(our_pwd_exec(cmd, false) == -1)
         return -1;
-    }    
+    } 
+
+    // help
+    if(strcmp(cmd->argv[0], "help") == 0){
+      help_exec(cmd);
+    }
+
     return cpid;
   }
 }
