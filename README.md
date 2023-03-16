@@ -2,6 +2,8 @@
 
 Tux Shell (tsh) is a simplistic shell that allows users to execute commands in a Unix-like environment. It provides a basic command-line interface where users can enter commands to interact with the operating system.
 
+The intial version of this shell was created as part of the Operating Systems course(CS 5600) at the Northeastern University. It was developed by [Bereket Yisehak](https://github.com/anjulo). It is still under development and more features will be added in the future.
+
 ## Features
 
 - Basic command-line interface
