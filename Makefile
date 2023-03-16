@@ -2,9 +2,9 @@ CC = gcc
 CFLAGS = -g -W -Wall -Werror -Wno-unused
 V = @
 
-all: cs5600sh
+all: tsh
 
-cs5600sh: cmdparse.o cmdrun.o main.o
+tsh: cmdparse.o cmdrun.o main.o
 	@echo + link $@
 	$(V)$(CC) $(CFLAGS) -lpthread -o $@ cmdparse.o cmdrun.o main.o
 
@@ -22,12 +22,12 @@ main.o: main.c cmdparse.h cmdrun.h
 
 clean:
 	@echo + clean
-	$(V)rm -rf *.o *~ *.bak core *.core cs5600sh freecheck
+	$(V)rm -rf *.o *~ *.bak core *.core tsh freecheck
 
-test: cs5600sh always
+test: tsh always
 	/usr/bin/perl -w ./tester.pl
 
-test2: cs5600sh always
+test2: tsh always
 	/usr/bin/perl -w ./tester2.pl
 
 always:

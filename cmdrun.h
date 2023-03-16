@@ -1,5 +1,5 @@
-#ifndef CS5600_OSPSH_H
-#define CS5600_OSPSH_H
+#ifndef TSH_OSPSH_H
+#define TSH_OSPSH_H
 
 /*
  * Header file for Lab 2 - Shell processing

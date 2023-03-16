@@ -41,7 +41,7 @@ main(int argc, char *argv[])
 		command_t *cmdlist; // linked list for a command
 		// Print the prompt
 		if (!quiet) {
-			printf("cs5600$ ");
+			printf("tsh$ ");
 			fflush(stdout);
 		}
 
@@ -55,8 +55,8 @@ main(int argc, char *argv[])
 			}
 			if (ferror(stdin))
 				// This function prints a description of the
-				// error, preceded by 'cs5600: '.
-				perror("cs5600");
+				// error, preceded by 'tsh: '.
+				perror("tsh");
 			break;
 		}
 

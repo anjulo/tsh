@@ -1,5 +1,5 @@
 *.o
-cs5600sh
+tsh
 .vscode
 input.txt
 output.txt

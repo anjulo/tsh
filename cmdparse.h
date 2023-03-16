@@ -1,5 +1,5 @@
-#ifndef CS5600_CMDLINE_H
-#define CS5600_CMDLINE_H
+#ifndef TSH_CMDLINE_H
+#define TSH_CMDLINE_H
 #include <unistd.h>
 
 /*

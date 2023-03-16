@@ -177,7 +177,7 @@ $rev = 'rev';
 
 # Multiple-lines
 	  [ '',
-	    './cs5600sh -q < temp.out',
+	    './tsh -q < temp.out',
 	    'Line 1 Line 2 Line 3' ],
 
 # Redirection
@@ -276,7 +276,7 @@ $rev = 'rev';
 
 # Exit
 	  [ '',
-	    './cs5600sh -q < temp.out',
+	    './tsh -q < temp.out',
 	    'Line 1' ],
 
 	  [ '',
@@ -303,12 +303,12 @@ $rev = 'rev';
 # Zombie
 # Method 1
 	  [ '(Zombie Processes)',
-	    'cat temp1.out | ./cs5600sh -q & sleep 2 ; ps | grep echo | grep -v grep | grep "<defunct>$"',
+	    'cat temp1.out | ./tsh -q & sleep 2 ; ps | grep echo | grep -v grep | grep "<defunct>$"',
 	    'Line 1 Line 2' ],
 
 # Method 2
 	  [ '',
-	    './cs5600sh -q < temp2.out',
+	    './tsh -q < temp2.out',
 	    '1 0' ],
 
 # CleanupMultiLine
@@ -321,7 +321,7 @@ $rev = 'rev';
 
 my($ntest) = 0;
 
-my($sh) = "./cs5600sh";
+my($sh) = "./tsh";
 my($tempfile) = "lab2test.txt";
 my($ntestfailed) = 0;
 
