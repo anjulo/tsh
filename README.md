@@ -2,8 +2,6 @@
 
 Tux Shell (tsh) is a simplistic shell that allows users to execute commands in a Unix-like environment. It provides a basic command-line interface where users can enter commands to interact with the operating system.
 
-The intial version of this shell was created as part of the Operating Systems course(CS 5600) at the Northeastern University. It was developed by [Bereket Yisehak](https://github.com/anjulo). It is still under development and more features will be added in the future.
-
 ## Features
 
 - Basic command-line interface
@@ -56,8 +54,4 @@ command | description
 ### External Commands
 The tux shell can execute external programs. To execute an external program, enter the name of the program at the command prompt. For example, to execute the `ls` command, enter `ls` at the command prompt. The tux shell will execute the `ls` command and display the output. If the program requires any arguments, they can be passed to the program by entering them after the program name. For example, to execute the `ls` command with the `-l` argument, enter `ls -l` at the command prompt. The tux shell will execute the `ls` command with the `-l` argument and display the output. 
 
-## Contributing
-Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
-
-## License
 
