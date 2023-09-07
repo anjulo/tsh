@@ -2,7 +2,7 @@
 #define TSH_OSPSH_H
 
 /*
- * Header file for Lab 2 - Shell processing
+ * Header file for tux shell
  * This file contains the definitions required for executing commands
  * parsed by the code in cmdparse.c
  */

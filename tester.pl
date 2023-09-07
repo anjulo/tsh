@@ -322,7 +322,7 @@ $rev = 'rev';
 my($ntest) = 0;
 
 my($sh) = "./tsh";
-my($tempfile) = "lab2test.txt";
+my($tempfile) = "tshtest.txt";
 my($ntestfailed) = 0;
 
 if (!-x $sh) {

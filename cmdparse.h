@@ -3,7 +3,7 @@
 #include <unistd.h>
 
 /*
- * Header file for commandline parsing for Lab 2 - Shell processing
+ * Header file for commandline parsing for tux shell
  * This file contains the definitions required for parsing input
  * from the command line.
  */

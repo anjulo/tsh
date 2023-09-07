@@ -1,5 +1,5 @@
 /*
- * Skeleton code for Lab 2 - Shell processing
+ * Skeleton code for tux shell processing
  * This file contains skeleton code for executing parsed commands.
  */
 

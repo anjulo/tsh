@@ -1,5 +1,5 @@
 /*
- * Skeleton code for commandline parsing for Lab 2 - Shell processing
+ * Skeleton code for commandline parsing for tux shell
  * This file contains the skeleton code for parsing input from the command
  * line.
  */

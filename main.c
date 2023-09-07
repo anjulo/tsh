@@ -1,5 +1,5 @@
 /*
- * Skeleton code for Lab 2 - Shell processing
+ * Skeleton code for tux shell
  */
 
 #include <stdio.h>
